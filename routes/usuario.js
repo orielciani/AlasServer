@@ -24,7 +24,7 @@ app.get('/', (req, res) => {
 // ========================================
 // Obtener usuario por id
 // ========================================
-app.get('/usuario/:id', mdAutenticacion.verificaToken, (req, res) => {
+app.get('/usuario/:id', (req, res) => {
   const id = req.params.id;
   Usuario.findById(id, 'nombre img role email')
   .exec( (err, usuario) => {
@@ -49,7 +49,7 @@ app.get('/usuario/:id', mdAutenticacion.verificaToken, (req, res) => {
 // ========================================
 // Crear usuario
 // ========================================
-app.post('/crear', [mdAutenticacion.verificaToken, mdAutenticacion.verificaADMIN_ROLE,], (req, res) => {
+app.post('/crear', (req, res) => {
   const body = req.body;
   const usuario = new Usuario({
     nombre: body.nombre,
@@ -74,7 +74,7 @@ app.post('/crear', [mdAutenticacion.verificaToken, mdAutenticacion.verificaADMIN
 // ========================================
 // Actualizar usuario
 // ========================================
-app.put('/actualizar/:id', mdAutenticacion.verificaToken, (req, res) => {
+app.put('/actualizar/:id',  (req, res) => {
   const body = req.body;
   const id = req.params.id;
   Usuario.findById(id, (err, usuario) => {
@@ -112,7 +112,7 @@ app.put('/actualizar/:id', mdAutenticacion.verificaToken, (req, res) => {
 // ========================================
 // Eliminar usuario por id
 // ========================================
-app.delete('/usuario/eliminar/:id', mdAutenticacion.verificaToken, (req, res) => {
+app.delete('/usuario/eliminar/:id',  (req, res) => {
   const id = req.params.id;
   Usuario.findByIdAndRemove(id)
   .exec( (err, usuarioBorrado) => {
