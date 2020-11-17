@@ -32,7 +32,7 @@ const busquedaRoutes = require('./routes/busqueda');
 
 
 // Connecting to database via Mongo Atlas
-const url = "Escondido";
+const url = "mongodb+srv://Orion:Artemisa2132as1321@artemisa.6h1q9.mongodb.net/AlasCentroDeDia?retryWrites=true&w=majority";
 mongoose.connection.openUri(url, (err, res) => {
   if (err) throw err;
   console.log('Base de datos Mongodb: ONLINE');
