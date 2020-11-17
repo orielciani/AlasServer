@@ -90,6 +90,12 @@ app.put('/actualizar/:id',  (req, res) => {
       message: 'No existe un usuario con el id ' + id + ' por lo tanto no se puede actualizar'
     })
     }
+    if (!usuario.password) {
+      return res.status(400).json({
+      ok: false,
+      message: 'No ingreso una contraseña'
+    })
+    }
     usuario.nombre = body.nombre;
     usuario.email = body.email;
     usuario.password = bcrypt.hashSync(body.password, 10);
