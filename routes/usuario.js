@@ -19,9 +19,18 @@ app.get('/', (req, res) => {
       message: 'No se pudo enviar'
       })
     }
+    Usuario.count({}, (err, conteo) => {
+      if ( err ) {
+      return res.status(500).json({
+      ok: false,
+      message: 'No se pudo enviar'
+      })
+    }
     return res.status(200).json({
       ok: true,
+      conteo: conteo,
       usuarios: usuarios
+    })
     })
   })
 });
