@@ -7,7 +7,11 @@ const mdAutenticacion = require('../middleware/autenticacion')
 // Obtener todos los usuarios
 // ========================================
 app.get('/', (req, res) => {
+  let desde = req.query.desde || 0;
+  desde = Number(desde);
   Usuario.find({}, 'nombre img role email')
+  .skip(desde)
+  .limit(5)
   .exec( (err, usuarios) => {
     if ( err ) {
       return res.status(500).json({
