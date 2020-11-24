@@ -6,7 +6,7 @@ const mdAutenticacion = require('../middleware/autenticacion')
 // ========================================
 // Obtener todos los usuarios
 // ========================================
-app.get('/', (req, res) => {
+app.get('/', [mdAutenticacion.verificaToken],  (req, res) => {
   let desde = req.query.desde || 0;
   desde = Number(desde);
   Usuario.find({}, 'nombre img role email')
@@ -37,7 +37,7 @@ app.get('/', (req, res) => {
 // ========================================
 // Obtener usuario por id
 // ========================================
-app.get('/usuario/:id', (req, res) => {
+app.get('/usuario/:id', [mdAutenticacion.verificaToken], (req, res) => {
   const id = req.params.id;
   Usuario.findById(id, 'nombre img role email')
   .exec( (err, usuario) => {
@@ -62,7 +62,7 @@ app.get('/usuario/:id', (req, res) => {
 // ========================================
 // Crear usuario
 // ========================================
-app.post('/crear', (req, res) => {
+app.post('/crear', [mdAutenticacion.verificaToken], (req, res) => {
   const body = req.body;
   const usuario = new Usuario({
     nombre: body.nombre,
@@ -87,7 +87,7 @@ app.post('/crear', (req, res) => {
 // ========================================
 // Actualizar usuario
 // ========================================
-app.put('/actualizar/:id',  (req, res) => {
+app.put('/actualizar/:id', [mdAutenticacion.verificaToken],  (req, res) => {
   const body = req.body;
   const id = req.params.id;
   Usuario.findById(id, (err, usuario) => {
@@ -132,7 +132,7 @@ app.put('/actualizar/:id',  (req, res) => {
 // ========================================
 // Eliminar usuario por id
 // ========================================
-app.delete('/usuario/eliminar/:id',  (req, res) => {
+app.delete('/usuario/eliminar/:id', [mdAutenticacion.verificaToken],  (req, res) => {
   const id = req.params.id;
   Usuario.findByIdAndRemove(id)
   .exec( (err, usuarioBorrado) => {
