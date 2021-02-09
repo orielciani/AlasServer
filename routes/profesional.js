@@ -6,7 +6,11 @@ const mdAutenticacion = require('../middleware/autenticacion')
 // Obtener todos los profesionales
 // ========================================
 app.get('/', (req, res) => {
+  let desde = req.query.desde || 0;
+  desde = Number(desde);
   Profesional.find({})
+  .skip(desde)
+  .limit(5)
   .exec( (err, profesionales) => {
     if ( err ) {
       return res.status(500).json({
@@ -14,9 +18,18 @@ app.get('/', (req, res) => {
       message: 'No se pudo buscar los profesionales'
       })
     }
+    Profesional.count({}, (err, conteo) => {
+      if ( err ) {
+      return res.status(500).json({
+      ok: false,
+      message: 'No se pudo enviar'
+      })
+    }
     return res.status(200).json({
       ok: true,
+      conteo: conteo,
       profesionales: profesionales
+    })
     })
   })
 });
@@ -48,7 +61,7 @@ app.get('/profesional/:id', (req, res) => {
 // ========================================
 // Agregar profesional
 // ========================================
-app.post('/agregar', (req, res) => {
+app.post('/agregar', [mdAutenticacion.verificaToken, mdAutenticacion.verificaADMIN_ROLE], (req, res) => {
   const body = req.body;
   const profesional = new Profesional({
         nombre: body.nombre,
@@ -64,33 +77,26 @@ app.post('/agregar', (req, res) => {
         correo: body.correo,
         cbu: body.cbu,
         profesion: body.profesion,
-        taller: body.taller,
         alta: body.alta,
         baja: body.baja,
         seguro: body.seguro,
         imagen: body.imagen,
-        asistencia: {
-            lunes: {
-                horarioLunes: body.horarioLunes,
-                actividadLunes: body.actividadLunes
-            },
-            martes: {
-                horarioMartes: body.horarioMartes,
-                actividadMartes: body.actividadMartes
-            },
-            miercoles: {
-                horarioMiercoles: body.horarioMiercoles,
-                actividadMiercoles: body.actividaMiercoles
-            },
-            jueves: {
-                horarioJueves: body.horarioJueves,
-                actividadJueves: body.actividadJueves
-            },
-            viernes: {
-                horarioViernes: body.horarioViernes,
-                actividadViernes: body.actividadViernes
-            }
-        }
+                inicioLunes: body.inicioLunes,
+                finalLunes: body.finalLunes,
+                actividadLunes: body.actividadLunes,
+                inicioMartes: body.inicioMartes,
+                finalMartes: body.finalMartes,
+                actividadMartes: body.actividadMartes,
+                inicioMiercoles: body.inicioMiercoles,
+                finalMiercoles: body.finalMiercoles,
+                actividadMiercoles: body.actividadMiercoles,
+                inicioJueves: body.inicioJueves,
+                finalJueves: body.finalJueves,
+                actividadJueves: body.actividadJueves,
+                inicioViernes: body.inicioViernes,
+                finalViernes: body.finalViernes,
+                actividadViernes: body.actividadViernes,
+
     });
   profesional.save((err, profesionalGuardado) => {
     if (err) {
@@ -109,7 +115,7 @@ app.post('/agregar', (req, res) => {
 // ========================================
 // Actualizar profesional
 // ========================================
-app.put('/actualizar/:id',  (req, res) => {
+app.put('/actualizar/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaADMIN_ROLE],  (req, res) => {
   const body = req.body;
   const id = req.params.id;
   Profesional.findById(id, (err, profesional) => {
@@ -140,19 +146,22 @@ app.put('/actualizar/:id',  (req, res) => {
     profesional.alta = body.alta;
     profesional.baja = body.baja;
     profesional.profesion = body.profesion;
-    profesional.taller = body.taller;
     profesional.imagen = body.imagen;
     profesional.seguro = body.seguro;
-    profesional.horarioLunes = body.horarioLunes;
     profesional.actividadLunes = body.actividadLunes;
-    profesional.horarioMartes = body.horarioMartes;
     profesional.actividadMartes = body.actividadMartes;
-    profesional.horarioMiercoles = body.horarioMiercoles;
     profesional.actividadMiercoles = body.actividadMiercoles;
-    profesional.horarioJueves = body.horarioJueves;
     profesional.actividadJueves = body.actividadJueves;
-    profesional.horarioViernes = body.horarioViernes;
     profesional.actividadViernes = body.actividadViernes;
+    profesional.inicioMartes = body.inicioMartes;
+    profesional.finalMartes = body.finalMartes;
+    profesional.inicioMiercoles = body.inicioMiercoles;
+    profesional.finalMiercoles = body.finalMiercoles;
+    profesional.inicioJueves = body.inicioJueves;
+    profesional.finalJueves = body.finalJueves;
+    profesional.inicioViernes = body.inicioViernes;
+    profesional.finalViernes = body.finalViernes;
+
 
     profesional.save((err, profesionalGuardado) => {
     if (err) {
@@ -172,7 +181,7 @@ app.put('/actualizar/:id',  (req, res) => {
 // ========================================
 // Eliminar profesional por id
 // ========================================
-app.delete('/eliminar/:id',  (req, res) => {
+app.delete('/eliminar/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaADMIN_ROLE], (req, res) => {
   const id = req.params.id;
   Profesional.findByIdAndRemove(id)
   .exec( (err, profesionalBorrado) => {

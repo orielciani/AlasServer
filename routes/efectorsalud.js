@@ -6,24 +6,37 @@ const mdAutenticacion = require('../middleware/autenticacion')
 // Obtener todos los efectore de ssalud
 // ========================================
 app.get('/', (req, res) => {
+  let desde = req.query.desde || 0;
+  desde = Number(desde);
   EfectorSalud.find({})
+  .skip(desde)
+  .limit(5)
   .exec( (err, efectoressalud) => {
     if ( err ) {
       return res.status(500).json({
       ok: false,
-      message: 'No se pudo buscar los efector de essalud'
+      message: 'No se pudo buscar los efector de salud'
+      })
+    }
+    EfectorSalud.count({}, (err, conteo) => {
+      if ( err ) {
+      return res.status(500).json({
+      ok: false,
+      message: 'No se pudo enviar'
       })
     }
     return res.status(200).json({
       ok: true,
+      conteo: conteo,
       efectoressalud: efectoressalud
+    })
     })
   })
 });
 // ========================================
 // Obtener un efector de salud por id
 // ========================================
-app.get('/efectorsalud/:id', (req, res) => {
+app.get('/efectorsalud/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaADMIN_ROLE], (req, res) => {
   const id = req.params.id;
   EfectorSalud.findById(id)
   .exec( (err, efectorsalud) => {
@@ -48,7 +61,7 @@ app.get('/efectorsalud/:id', (req, res) => {
 // ========================================
 // Agregar un efector de salud
 // ========================================
-app.post('/agregar', (req, res) => {
+app.post('/agregar', [mdAutenticacion.verificaToken, mdAutenticacion.verificaADMIN_ROLE], (req, res) => {
   const body = req.body;
   const efectorsalud = new EfectorSalud({
         nombre: body.nombre,
@@ -58,7 +71,7 @@ app.post('/agregar', (req, res) => {
         correo: body.correo,
         contacto: body.contacto,
         distrito: body.distrito,
-        oberservacion: body.oberservacion
+        observacion: body.observacion
     });
   efectorsalud.save((err, efectorsaludGuardado) => {
     if (err) {
@@ -77,7 +90,7 @@ app.post('/agregar', (req, res) => {
 // ========================================
 // Actualizar efector de salud
 // ========================================
-app.put('/actualizar/:id',  (req, res) => {
+app.put('/actualizar/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaADMIN_ROLE],  (req, res) => {
   const body = req.body;
   const id = req.params.id;
   EfectorSalud.findById(id, (err, efectorsalud) => {
@@ -100,7 +113,7 @@ app.put('/actualizar/:id',  (req, res) => {
     efectorsalud.correo = body.correo;
     efectorsalud.contacto = body.contacto;
     efectorsalud.distrito = body.distrito;
-    efectorsalud.oberservacion = body.oberservacion;
+    efectorsalud.observacion = body.observacion;
 
     efectorsalud.save((err, efectorsaludGuardado) => {
     if (err) {
@@ -120,7 +133,7 @@ app.put('/actualizar/:id',  (req, res) => {
 // ========================================
 // Eliminar efectorsalud por id
 // ========================================
-app.delete('/eliminar/:id',  (req, res) => {
+app.delete('/eliminar/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaADMIN_ROLE],  (req, res) => {
   const id = req.params.id;
   EfectorSalud.findByIdAndRemove(id)
   .exec( (err, efectorsaludBorrado) => {

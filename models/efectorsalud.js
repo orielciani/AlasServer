@@ -9,6 +9,6 @@ const efectorSaludSchema = new Schema({
   correo: { type: String, required: [true, 'El correo es necesario'], },
   contacto: { type: String, required: [true, 'El correo es necesario'], },
   distrito: { type: String, required: [true, 'El distrito es necesario'], },
-  oberservacion: { type: String, required: false }
+  observacion: { type: String, required: false }
 }, { collection: 'efectoressalud' }); efectorSaludSchema.plugin(uniqueValidator, { message: '{PATH} debe ser unico' });
 module.exports = mongoose.model('EfectorSalud', efectorSaludSchema);

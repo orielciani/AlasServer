@@ -15,35 +15,25 @@ const profesionalSchema = new Schema({
   ib: { type: String, required: false },
   cbu: { type: String, required: false },
   profesion: { type: String, required: false },
-  taller: { type: String, required: false },
   alta: { type: String, required: false },
   baja: { type: String, required: false },
   seguro: { type: String, required: false },
   imagen: { type: String, required: false },
-  asistencia: [{
-    lunes: [{
-      horarioLunes: { type: String, required: false },
-      actividadLunes: { type: String, required: false }
-    }],
-    martes: [{
-      horarioMartes: { type: String, required: false },
-      actividadMartes: { type: String, required: false }
-    }],
-    miercoles: [{
-      horarioMiercoles: { type: String, required: false },
-      actividadMiercoles: { type: String, required: false }
-    }],
-    jueves: [{
-      horarioJueves: { type: String, required: false },
-      actividadJueves: { type: String, required: false }
-    }],
-    viernes: [{
-      horarioViernes: { type: String, required: false },
+      inicioLunes: { type: String, required: false },
+      finalLunes: { type: String, required: false },
+      actividadLunes: { type: String, required: false },
+      inicioMartes: { type: String, required: false },
+      finalMartes: { type: String, required: false },
+      actividadMartes: { type: String, required: false },
+      inicioMiercoles: { type: String, required: false },
+      finalMiercoles: { type: String, required: false },
+      actividadMiercoles: { type: String, required: false },
+      inicioJueves: { type: String, required: false },
+      finalJueves: { type: String, required: false },
+      actividadJueves: { type: String, required: false },
+      inicioViernes: { type: String, required: false },
+      finalViernes: { type: String, required: false },
       actividadViernes: { type: String, required: false }
-    }],
-
-  }]
-
 
 }, { collection: 'profesionales' });
 

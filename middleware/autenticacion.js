@@ -30,3 +30,19 @@ exports.verificaADMIN_ROLE = function(req, res, next) {
         });
     }
 }
+// ========================================
+// Verificar soy yo
+// ========================================
+exports.verificaYo = function(req, res, next) {
+  const usuario = req.usuario;
+  const id = req.params.id;
+  if ( usuario._id === id ) {
+    return res.status(401).json({
+        ok: false,
+        mensaje: 'No puedes eliminarte a si mismo'
+    });
+  } else {
+    next();
+    return;
+  }
+}

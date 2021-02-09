@@ -6,7 +6,11 @@ const mdAutenticacion = require('../middleware/autenticacion')
 // Obtener todos los proveedores
 // ========================================
 app.get('/', (req, res) => {
+  let desde = req.query.desde || 0;
+  desde = Number(desde);
   Proveedor.find({})
+  .skip(desde)
+  .limit(5)
   .exec( (err, proveedores) => {
     if ( err ) {
       return res.status(500).json({
@@ -14,9 +18,18 @@ app.get('/', (req, res) => {
       message: 'No se pudo buscar los  proveedores'
       })
     }
+    Proveedor.count({}, (err, conteo) => {
+      if ( err ) {
+      return res.status(500).json({
+      ok: false,
+      message: 'No se pudo enviar'
+      })
+    }
     return res.status(200).json({
       ok: true,
+      conteo: conteo,
       proveedores: proveedores
+    })
     })
   })
 });
@@ -48,7 +61,7 @@ app.get('/proveedor/:id', (req, res) => {
 // ========================================
 // Agregar proveedor
 // ========================================
-app.post('/agregar', (req, res) => {
+app.post('/agregar', [mdAutenticacion.verificaToken, mdAutenticacion.verificaADMIN_ROLE], (req, res) => {
   const body = req.body;
   const proveedor = new Proveedor({
         denominacion: body.denominacion,
@@ -81,7 +94,7 @@ app.post('/agregar', (req, res) => {
 // ========================================
 // Actualizar proveedor
 // ========================================
-app.put('/actualizar/:id',  (req, res) => {
+app.put('/actualizar/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaADMIN_ROLE],  (req, res) => {
   const body = req.body;
   const id = req.params.id;
   Proveedor.findById(id, (err, proveedor) => {
@@ -97,6 +110,13 @@ app.put('/actualizar/:id',  (req, res) => {
       message: 'No existe un proveedor con el id ' + id + ' por lo tanto no se puede actualizar'
     })
     }
+    if(!proveedor.denominacion || !proveedor.direccion || !proveedor.ciudad || !proveedor.cp || !proveedor.provincia || !proveedor.ci || !proveedor.cuit || !proveedor.telefono
+      || !proveedor.celular || !proveedor.correo || !proveedor.contacto || !proveedor.actividad) {
+      return res.status(400).json({
+        ok: false,
+        message: 'Uno o mas campos no fueron llenados, y todos son necesarios'
+      })
+      }
     proveedor.denominacion = body.denominacion;
     proveedor.direccion = body.direccion;
     proveedor.ciudad = body.ciudad;
@@ -127,7 +147,7 @@ app.put('/actualizar/:id',  (req, res) => {
 // ========================================
 // Eliminar proveedor por id
 // ========================================
-app.delete('/eliminar/:id',  (req, res) => {
+app.delete('/eliminar/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaADMIN_ROLE],  (req, res) => {
   const id = req.params.id;
   Proveedor.findByIdAndRemove(id)
   .exec( (err, proveedorBorrado) => {

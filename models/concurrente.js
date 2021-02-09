@@ -26,7 +26,7 @@ var concurrenteSchema = new Schema({
     diagnostico: { type: String, required: false },
     tratamiento: { type: String, required: false },
     equiporeferencia: { type: String, required: false },
-    responsable: [{
+    responsable: {
         nombrefamiliar: { type: String, required: false },
         vinculofamiliar: { type: String, required: false },
         direccionfamiliar: { type: String, required: false },
@@ -39,8 +39,8 @@ var concurrenteSchema = new Schema({
         correofamiliar: { type: String, required: false },
         ocupacionfamiliar: { type: String, required: false },
         convivientefamiliar: { type: String, required: false }
-    }],
-    transporte: [{
+    },
+    transporte: {
         nombretransporte: { type: String, required: false },
         contactotransporte: { type: String, required: false },
         cuittransporte: { type: String, required: false },
@@ -50,8 +50,8 @@ var concurrenteSchema = new Schema({
         telefonotransporte: { type: String, required: false },
         celulartransporte: { type: String, required: false },
         correotransporte: { type: String, required: false }
-    }],
-    asistenteterapeutico: [{
+    },
+    asistenteterapeutico: {
         tieneasistente: { type: String, required: false },
         nombreasistente: { type: String, required: false },
         cuitasistente: { type: String, required: false },
@@ -62,8 +62,8 @@ var concurrenteSchema = new Schema({
         cuilasistente: { type: String, required: false },
         ibasistente: { type: String, required: false },
         profesionasistente: { type: String, required: false }
-    }],
-    asistencia: [{
+    },
+    asistencia: {
         mananalunes: { type: String, required: false },
         mananamartes: { type: String, required: false },
         mananamiercoles: { type: String, required: false },
@@ -74,8 +74,8 @@ var concurrenteSchema = new Schema({
         tardemiercoles: { type: String, required: false },
         tardejueves: { type: String, required: false },
         tardeviernes: { type: String, required: false }
-    }],
-    taller: [{
+    },
+    taller: {
         tmananalunes: { type: String, required: false },
         tmananamartes: { type: String, required: false },
         tmananamiercoles: { type: String, required: false },
@@ -86,7 +86,7 @@ var concurrenteSchema = new Schema({
         ttardemiercoles: { type: String, required: false },
         ttardejueves: { type: String, required: false },
         ttardeviernes: { type: String, required: false }
-    }]
+    }
 
 
 }, { collection: 'concurrentes' });

@@ -6,7 +6,11 @@ const mdAutenticacion = require('../middleware/autenticacion')
 // Obtener todass las instituciones
 // ========================================
 app.get('/', (req, res) => {
+  let desde = req.query.desde || 0;
+  desde = Number(desde);
   Institucion.find({})
+  .skip(desde)
+    .limit(5)
     .exec((err, instituciones) => {
       if (err) {
         return res.status(500).json({
@@ -14,9 +18,18 @@ app.get('/', (req, res) => {
           message: 'No se pudo buscar las instituciones'
         })
       }
+      Institucion.count({}, (err, conteo) => {
+        if ( err ) {
+        return res.status(500).json({
+        ok: false,
+        message: 'No se pudo enviar'
+        })
+      }
       return res.status(200).json({
         ok: true,
+        conteo: conteo,
         instituciones: instituciones
+      })
       })
     })
 });
@@ -48,7 +61,7 @@ app.get('/institucion/:id', (req, res) => {
 // ========================================
 // Agregar institucion
 // ========================================
-app.post('/agregar', (req, res) => {
+app.post('/agregar', [mdAutenticacion.verificaToken, mdAutenticacion.verificaADMIN_ROLE], (req, res) => {
   const body = req.body;
   const institucion = new Institucion({
         denominacion: body.denominacion,
@@ -64,6 +77,7 @@ app.post('/agregar', (req, res) => {
         correo: body.correo,
         contacto: body.contacto,
         contactocel: body.contactocel,
+        contactocorreo: body.contactocorreo,
         web: body.web,
         otros: body.otros
 
@@ -85,7 +99,7 @@ app.post('/agregar', (req, res) => {
 // ========================================
 // Actualizar institucion
 // ========================================
-app.put('/actualizar/:id', (req, res) => {
+app.put('/actualizar/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaADMIN_ROLE], (req, res) => {
   const body = req.body;
   const id = req.params.id;
   Institucion.findById(id, (err, institucion) => {
@@ -102,18 +116,19 @@ app.put('/actualizar/:id', (req, res) => {
       })
     }
     institucion.denominacion = body.denominacion;
-    institucion.direccion = body.direccion;
-    institucion.ciudad = body.ciudad;
-    institucion.codpos = body.codpos;
     institucion.provincia = body.provincia;
-    institucion.ci = body.ci;
+    institucion.ciudad = body.ciudad;
+    institucion.direccion = body.direccion;
+    institucion.codpos = body.codpos;
     institucion.cuit = body.cuit;
+    institucion.ci = body.ci;
     institucion.ib = body.ib;
     institucion.telefono = body.telefono;
     institucion.celular = body.celular;
     institucion.correo = body.correo;
     institucion.contacto = body.contacto;
     institucion.contactocel = body.contactocel;
+    institucion.contactocorreo = body.contactocorreo;
     institucion.web = body.web;
     institucion.otros = body.otros;
     institucion.save((err, institucionGuardada) => {
@@ -134,7 +149,7 @@ app.put('/actualizar/:id', (req, res) => {
 // ========================================
 // Eliminar institucion por id
 // ========================================
-app.delete('/eliminar/:id', (req, res) => {
+app.delete('/eliminar/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaADMIN_ROLE], (req, res) => {
   const id = req.params.id;
   Institucion.findByIdAndRemove(id)
     .exec((err, institucionBorrada) => {

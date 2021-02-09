@@ -6,7 +6,7 @@ const mdAutenticacion = require('../middleware/autenticacion')
 // ========================================
 // Obtener todos los usuarios
 // ========================================
-app.get('/', [mdAutenticacion.verificaToken],  (req, res) => {
+app.get('/', [mdAutenticacion.verificaToken],   (req, res) => {
   let desde = req.query.desde || 0;
   desde = Number(desde);
   Usuario.find({}, 'nombre img role email')
@@ -37,21 +37,21 @@ app.get('/', [mdAutenticacion.verificaToken],  (req, res) => {
 // ========================================
 // Obtener usuario por id
 // ========================================
-app.get('/usuario/:id', [mdAutenticacion.verificaToken], (req, res) => {
+app.get('/usuario/:id', [mdAutenticacion.verificaToken],  (req, res) => {
   const id = req.params.id;
   Usuario.findById(id, 'nombre img role email')
   .exec( (err, usuario) => {
-    if ( err ) {
-      return res.status(500).json({
-      ok: false,
-      message: 'No se pudo enviar'
-      })
-    }
     if ( !usuario ) {
       return res.status(400).json({
       ok: false,
       message: 'No existe un usuario con el id ' + id
     })
+    }
+    if ( err ) {
+      return res.status(500).json({
+      ok: false,
+      message: 'No se pudo enviar'
+      })
     }
      res.status(200).json({
       ok: true,
@@ -62,8 +62,14 @@ app.get('/usuario/:id', [mdAutenticacion.verificaToken], (req, res) => {
 // ========================================
 // Crear usuario
 // ========================================
-app.post('/crear', [mdAutenticacion.verificaToken], (req, res) => {
+app.post('/crear', [mdAutenticacion.verificaToken],  (req, res) => {
   const body = req.body;
+  if (!body.nombre || !body.email || !body.role || !body.password || body.password === null) {
+    return res.status(400).json({
+    ok: false,
+    message: 'Debe llenar todo el formulario para crear un nuevo usuario'
+  })
+  }
   const usuario = new Usuario({
     nombre: body.nombre,
     email: body.email,
@@ -87,7 +93,7 @@ app.post('/crear', [mdAutenticacion.verificaToken], (req, res) => {
 // ========================================
 // Actualizar usuario
 // ========================================
-app.put('/actualizar/:id', [mdAutenticacion.verificaToken],  (req, res) => {
+app.put('/actualizar/:id', [mdAutenticacion.verificaToken],   (req, res) => {
   const body = req.body;
   const id = req.params.id;
   Usuario.findById(id, (err, usuario) => {
@@ -103,15 +109,18 @@ app.put('/actualizar/:id', [mdAutenticacion.verificaToken],  (req, res) => {
       message: 'No existe un usuario con el id ' + id + ' por lo tanto no se puede actualizar'
     })
     }
-    if (!body.password || body.password === null) {
-      return res.status(400).json({
-      ok: false,
-      message: 'No ingreso una contraseña'
-    })
-    }
+    // if (!body.password || body.password === null) {
+    //   return res.status(400).json({
+    //   ok: false,
+    //   message: 'No ingreso una contraseña'
+    // })
+    // }
     usuario.nombre = body.nombre;
     usuario.email = body.email;
-    usuario.password = bcrypt.hashSync(body.password, 10);
+    if( body.password !== null || '' ) {
+       usuario.password = bcrypt.hashSync(body.password, 10);
+    }
+    // usuario.password = bcrypt.hashSync(body.password, 10);
     usuario.role = body.role;
   usuario.save((err, usuarioGuardado) => {
     if (err) {
@@ -132,7 +141,7 @@ app.put('/actualizar/:id', [mdAutenticacion.verificaToken],  (req, res) => {
 // ========================================
 // Eliminar usuario por id
 // ========================================
-app.delete('/usuario/eliminar/:id', [mdAutenticacion.verificaToken],  (req, res) => {
+app.delete('/usuario/eliminar/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaADMIN_ROLE, mdAutenticacion.verificaYo],   (req, res) => {
   const id = req.params.id;
   Usuario.findByIdAndRemove(id)
   .exec( (err, usuarioBorrado) => {

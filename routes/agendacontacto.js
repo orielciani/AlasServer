@@ -6,7 +6,11 @@ const mdAutenticacion = require('../middleware/autenticacion')
 // Obtener todos los contactos
 // ========================================
 app.get('/', (req, res) => {
+  let desde = req.query.desde || 0;
+  desde = Number(desde);
   AgendaContacto.find({})
+  .skip(desde)
+  .limit(5)
   .exec( (err, contactos) => {
     if ( err ) {
       return res.status(500).json({
@@ -14,9 +18,18 @@ app.get('/', (req, res) => {
       message: 'No se pudo buscar los  contactos'
       })
     }
+    AgendaContacto.count({}, (err, conteo) => {
+      if ( err ) {
+      return res.status(500).json({
+      ok: false,
+      message: 'No se pudo enviar'
+      })
+    }
     return res.status(200).json({
       ok: true,
+      conteo: conteo,
       contactos: contactos
+    })
     })
   })
 });

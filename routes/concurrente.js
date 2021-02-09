@@ -6,7 +6,11 @@ const mdAutenticacion = require('../middleware/autenticacion')
 // Obtener todos los concurrente
 // ========================================
 app.get('/', (req, res) => {
+  let desde = req.query.desde || 0;
+  desde = Number(desde);
   Concurrente.find({})
+  .skip(desde)
+  .limit(5)
   .exec( (err, concurrentes) => {
     if ( err ) {
       return res.status(500).json({
@@ -14,9 +18,18 @@ app.get('/', (req, res) => {
       message: 'No se pudo buscar los concurrente'
       })
     }
+    Concurrente.count({}, (err, conteo) => {
+      if ( err ) {
+      return res.status(500).json({
+      ok: false,
+      message: 'No se pudo enviar'
+      })
+    }
     return res.status(200).json({
       ok: true,
+      conteo: conteo,
       concurrentes: concurrentes
+    })
     })
   })
 });
@@ -48,7 +61,7 @@ app.get('/concurrente/:id', (req, res) => {
 // ========================================
 // Agregar concurrente
 // ========================================
-app.post('/agregar', (req, res) => {
+app.post('/agregar', [mdAutenticacion.verificaToken, mdAutenticacion.verificaADMIN_ROLE], (req, res) => {
   const body = req.body;
   const concurrente = new Concurrente({
         nombre: body.nombre,
@@ -154,7 +167,7 @@ app.post('/agregar', (req, res) => {
 // ========================================
 // Actualizar concurrente
 // ========================================
-app.put('/actualizar/:id',  (req, res) => {
+app.put('/actualizar/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaADMIN_ROLE],  (req, res) => {
   const body = req.body;
   const id = req.params.id;
   Concurrente.findById(id, (err, concurrente) => {
@@ -263,7 +276,7 @@ app.put('/actualizar/:id',  (req, res) => {
 // ========================================
 // Eliminar concurrente por id
 // ========================================
-app.delete('/eliminar/:id',  (req, res) => {
+app.delete('/eliminar/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaADMIN_ROLE],  (req, res) => {
   const id = req.params.id;
   Concurrente.findByIdAndRemove(id)
   .exec( (err, concurrenteBorrado) => {

@@ -6,7 +6,11 @@ const mdAutenticacion = require('../middleware/autenticacion')
 // Obtener todass las obras sociales
 // ========================================
 app.get('/', (req, res) => {
+  let desde = req.query.desde || 0;
+  desde = Number(desde);
   ObraSocial.find({})
+  .skip(desde)
+  .limit(5)
     .exec((err, obrasSociales) => {
       if (err) {
         return res.status(500).json({
@@ -14,9 +18,18 @@ app.get('/', (req, res) => {
           message: 'No se pudo buscar las obras sociales'
         })
       }
+      ObraSocial.count({}, (err, conteo) => {
+        if ( err ) {
+        return res.status(500).json({
+        ok: false,
+        message: 'No se pudo enviar'
+        })
+      }
       return res.status(200).json({
         ok: true,
+        conteo: conteo,
         obrasSociales: obrasSociales
+      })
       })
     })
 });
@@ -48,7 +61,7 @@ app.get('/obrasocial/:id', (req, res) => {
 // ========================================
 // Agregar obra social
 // ========================================
-app.post('/agregar', (req, res) => {
+app.post('/agregar', [mdAutenticacion.verificaToken, mdAutenticacion.verificaADMIN_ROLE], (req, res) => {
   const body = req.body;
   const obrasocial = new ObraSocial({
     nombre: body.nombre,
@@ -82,7 +95,7 @@ app.post('/agregar', (req, res) => {
 // ========================================
 // Actualizar obra social
 // ========================================
-app.put('/actualizar/:id', (req, res) => {
+app.put('/actualizar/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaADMIN_ROLE], (req, res) => {
   const body = req.body;
   const id = req.params.id;
   ObraSocial.findById(id, (err, obrasocial) => {
@@ -129,7 +142,7 @@ app.put('/actualizar/:id', (req, res) => {
 // ========================================
 // Eliminar obra social por id
 // ========================================
-app.delete('/eliminar/:id', (req, res) => {
+app.delete('/eliminar/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaADMIN_ROLE], (req, res) => {
   const id = req.params.id;
   ObraSocial.findByIdAndRemove(id)
     .exec((err, obrasocialBorrada) => {

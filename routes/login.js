@@ -4,6 +4,21 @@ const jwt = require('jsonwebtoken');
 const SEED = require('../config/config').SEED;
 const Usuario = require('../models/usuario')
 const app = express();
+const mdAutenticacion = require('../middleware/autenticacion');
+
+// ========================================
+// Renueva Token
+// ========================================
+app.get('/renuevatoken', mdAutenticacion.verificaToken, (req, res) => {
+
+    const token = jwt.sign({ usuario: req.usuario }, SEED, { expiresIn: 14400 }); // 4 horas
+
+    res.status(200).json({
+        ok: true,
+        token: token
+    });
+
+});
 // ========================================
 // Login
 // ========================================
