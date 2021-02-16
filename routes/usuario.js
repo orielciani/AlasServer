@@ -6,7 +6,7 @@ const mdAutenticacion = require('../middleware/autenticacion')
 // ========================================
 // Obtener todos los usuarios
 // ========================================
-app.get('/', [mdAutenticacion.verificaToken],   (req, res) => {
+app.get('/',    (req, res) => {
   let desde = req.query.desde || 0;
   desde = Number(desde);
   Usuario.find({}, 'nombre img role email')
